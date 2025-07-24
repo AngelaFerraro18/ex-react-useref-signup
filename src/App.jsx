@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:'\\,.<>?/`~";
 
 function App() {
 
@@ -11,12 +15,40 @@ function App() {
     description: ''
   })
 
+  const isUsernameValid = useMemo(() => {
+
+    const { username } = formData;
+
+    const charsValid = username.split('').every(char => letters.includes(char.toLowerCase()) || numbers.includes(char));
+    return charsValid && username.length >= 6;
+
+  }, [formData.username]);
+
+
+  const isPasswordValid = useMemo(() => {
+
+    const { password } = formData;
+
+    const numberValid = password.split('').some(n => letters.includes(n) || numbers.includes(n) || symbols.includes(n));
+
+    return numberValid && password.length >= 8;
+
+  }, [formData.password]);
+
+  const isDescriptionValid = useMemo(() => {
+
+    const { description } = formData;
+
+    const descriptionValid = description.trim();
+
+    return descriptionValid.length >= 100 && descriptionValid.length <= 1000;
+
+  }, [formData.description])
 
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }))
   }
-
 
   function handleForm(e) {
     e.preventDefault();
@@ -41,11 +73,15 @@ function App() {
           value={formData.name}
           onChange={handleChange} />
 
+        {formData.username.length > 0 && (!isUsernameValid ? (<span style={{ color: 'red' }}>Username non valido!</span>) : (<span style={{ color: 'green' }}>Username valido!</span>))}
+
         <input type="text"
           placeholder="Username"
           name="username"
           value={formData.username}
           onChange={handleChange} />
+
+        {formData.password.length > 0 && (!isPasswordValid ? (<span style={{ color: 'red' }}>Password non valida!</span>) : (<span style={{ color: 'green' }}>Password valida!</span>))}
 
         <input type="password"
           placeholder="Password"
@@ -65,6 +101,8 @@ function App() {
           name="year"
           value={formData.year}
           onChange={handleChange} />
+
+        {formData.description.length > 0 && (!isDescriptionValid ? (<span style={{ color: 'red' }}>Descrizione non valida!</span>) : (<span style={{ color: 'green' }}>Descrizione valida!</span>))}
 
         <textarea placeholder="Breve descrizione..." name="description"
           value={formData.description}
