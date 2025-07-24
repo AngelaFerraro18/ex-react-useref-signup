@@ -20,7 +20,7 @@ function App() {
     const { username } = formData;
 
     const charsValid = username.split('').every(char => letters.includes(char.toLowerCase()) || numbers.includes(char));
-    return charsValid && username.length >= 6;
+    return charsValid && username.trim().length >= 6;
 
   }, [formData.username]);
 
@@ -29,9 +29,7 @@ function App() {
 
     const { password } = formData;
 
-    const numberValid = password.split('').some(n => letters.includes(n) || numbers.includes(n) || symbols.includes(n));
-
-    return numberValid && password.length >= 8;
+    return (password.trim().length >= 8 && password.split('').some(n => letters.includes(n)) && password.split('').some(n => numbers.includes(n)) && password.split('').some(n => symbols.includes(n)));
 
   }, [formData.password]);
 
@@ -53,7 +51,7 @@ function App() {
   function handleForm(e) {
     e.preventDefault();
 
-    if (formData.name.trim() === '' || formData.username.trim() === '' || formData.password.trim() === '' || formData.select.trim() === '' || formData.description.trim() === '') {
+    if (formData.name.trim() === '' || formData.username.trim() === '' || formData.password.trim() === '' || formData.select.trim() === '' || formData.description.trim() === '' || isUsernameValid || isPasswordValid || isDescriptionValid) {
       console.log('Tutti i campi devono essere compilati!')
     } else if (Number(formData.year) <= 0) {
       console.log('Devi inserire un numero maggiore di 0.')
@@ -102,7 +100,7 @@ function App() {
           value={formData.year}
           onChange={handleChange} />
 
-        {formData.description.length > 0 && (!isDescriptionValid ? (<span style={{ color: 'red' }}>Descrizione non valida!</span>) : (<span style={{ color: 'green' }}>Descrizione valida!</span>))}
+        {formData.description.length > 0 && (!isDescriptionValid ? (<span style={{ color: 'red' }}>Descrizione non valida, deve essere compresa tra 100 e 1000 caratteri! Hai scritto {formData.description.trim().length} caratteri.</span>) : (<span style={{ color: 'green' }}>Descrizione valida!</span>))}
 
         <textarea placeholder="Breve descrizione..." name="description"
           value={formData.description}
