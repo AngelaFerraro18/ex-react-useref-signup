@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
@@ -7,13 +7,16 @@ const symbols = "!@#$%^&*()-_=+[]{}|;:'\\,.<>?/`~";
 function App() {
 
   const [formData, setFormData] = useState({
-    name: '',
     username: '',
     password: '',
-    select: '',
-    year: '',
     description: ''
   })
+
+
+  //campi non controllati
+  const nameRef = useRef();
+  const selectRef = useRef();
+  const yearRef = useRef();
 
   const isUsernameValid = useMemo(() => {
 
@@ -51,13 +54,30 @@ function App() {
   function handleForm(e) {
     e.preventDefault();
 
-    if (formData.name.trim() === '' || formData.username.trim() === '' || formData.password.trim() === '' || formData.select.trim() === '' || formData.description.trim() === '' || isUsernameValid || isPasswordValid || isDescriptionValid) {
-      console.log('Tutti i campi devono essere compilati!')
-    } else if (Number(formData.year) <= 0) {
-      console.log('Devi inserire un numero maggiore di 0.')
-    } else {
-      console.log(`I dati del form sono: \n nome completo: ${formData.name} \n username: ${formData.username} \n password: ${formData.password} \n specializzazione: ${formData.select} \n anni di esperienza: ${formData.year} \n descrizione: ${formData.description}`)
+    //valori non controllati
+    const nameValue = nameRef.current.value;
+    const selectValue = selectRef.current.value;
+    const yearValue = yearRef.current.value;
+
+    if (!nameValue ||
+      formData.username.trim() === '' ||
+      formData.password.trim() === '' ||
+      !selectValue ||
+      formData.description.trim() === '' ||
+      !isUsernameValid ||
+      !isPasswordValid ||
+      !isDescriptionValid) {
+      console.log('Tutti i campi devono essere compilati!');
+      return;
     }
+
+    if (Number(yearValue) <= 0) {
+      console.log('Devi inserire un numero maggiore di 0.');
+      return;
+    }
+
+
+    console.log(`I dati del form sono: \n nome completo: ${nameValue} \n username: ${formData.username} \n password: ${formData.password} \n specializzazione: ${selectValue} \n anni di esperienza: ${yearValue} \n descrizione: ${formData.description}`)
 
 
   }
@@ -67,9 +87,7 @@ function App() {
       <form onSubmit={handleForm}>
         <input type="text"
           placeholder="Nome completo"
-          name="name"
-          value={formData.name}
-          onChange={handleChange} />
+          ref={nameRef} />
 
         {formData.username.length > 0 && (!isUsernameValid ? (<span style={{ color: 'red' }}>Username non valido!</span>) : (<span style={{ color: 'green' }}>Username valido!</span>))}
 
@@ -87,7 +105,7 @@ function App() {
           value={formData.password}
           onChange={handleChange} />
 
-        <select name="select" value={formData.select} onChange={handleChange}>
+        <select ref={selectRef}>
           <option value="">Specializzazione</option>
           <option value="full-stack">Full Stack</option>
           <option value="frontend">Frontend</option>
@@ -96,9 +114,7 @@ function App() {
 
         <input type="number"
           placeholder="Anni di esperienza"
-          name="year"
-          value={formData.year}
-          onChange={handleChange} />
+          ref={yearRef} />
 
         {formData.description.length > 0 && (!isDescriptionValid ? (<span style={{ color: 'red' }}>Descrizione non valida, deve essere compresa tra 100 e 1000 caratteri! Hai scritto {formData.description.trim().length} caratteri.</span>) : (<span style={{ color: 'green' }}>Descrizione valida!</span>))}
 
