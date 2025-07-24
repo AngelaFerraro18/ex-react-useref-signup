@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
@@ -82,9 +82,28 @@ function App() {
 
   }
 
+  useEffect(() => {
+    nameRef.current.focus();
+  }, []);
+
+  function resetForm(e) {
+    e.preventDefault();
+    setFormData({
+      username: '',
+      password: '',
+      description: ''
+    });
+    nameRef.current.value = '';
+    selectRef.current.value = '';
+    yearRef.current.value = '';
+    nameRef.current.focus();
+  }
+
+  const formRef = useRef();
+
   return (
     <>
-      <form onSubmit={handleForm}>
+      <form onSubmit={handleForm} ref={formRef}>
         <input type="text"
           placeholder="Nome completo"
           ref={nameRef} />
@@ -123,7 +142,10 @@ function App() {
           onChange={handleChange}></textarea>
 
         <button type="submit">Invia il form!</button>
+        <button onClick={resetForm}>Reset</button>
       </form>
+      <footer style={{ height: '100vh' }}></footer>
+      <button onClick={() => { formRef.current.scrollIntoView({ behavior: 'smooth' }) }} style={{ position: 'fixed', bottom: '20px', right: '20px' }}>Torna su</button>
     </>
   )
 }
